@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Rápido: El Duelo de Conocimiento 🧠</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🧠 Quiz Rápido: El Duelo de Conocimiento</h1>
+            <div class="status">
+                <span id="status-conexion" class="status-item">⚪ Desconectado</span>
+                <span id="sala-actual" class="status-item hidden">🏠 Sala: ---</span>
+            </div>
+        </header>
+
+        <!-- Panel de Identificación -->
+        <div id="panel-identificacion" class="panel">
+            <h2>🎯 Únete al Quiz</h2>
+            
+            <!-- Selector de Rol -->
+            <div class="rol-selector">
+                <button type="button" id="btn-rol-docente" class="btn btn-primary">
+                    👨‍🏫 Soy Docente
+                </button>
+                <button type="button" id="btn-rol-estudiante" class="btn btn-secondary">
+                    👩‍🎓 Soy Estudiante
+                </button>
+            </div>
+
+            <!-- Formulario para Docente -->
+            <div id="form-docente" class="form-container hidden">
+                <h3>👨‍🏫 Crear Sala de Quiz</h3>
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="input-nombre-docente" 
+                        placeholder="Ingresa tu nombre"
+                        maxlength="20"
+                        required
+                    >
+                    <button id="btn-crear-sala" class="btn btn-success">🏠 Crear Sala</button>
+                </div>
+                <p class="hint">💡 Se generará un código único para que los estudiantes se unan</p>
+            </div>
+
+            <!-- Formulario para Estudiante -->
+            <div id="form-estudiante" class="form-container hidden">
+                <h3>👩‍🎓 Unirse a Sala</h3>
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="input-nombre-estudiante" 
+                        placeholder="Tu nombre"
+                        maxlength="20"
+                        required
+                    >
+                </div>
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="input-codigo-sala" 
+                        placeholder="Código de sala (ej: ABC123)"
+                        maxlength="6"
+                        style="text-transform: uppercase;"
+                        required
+                    >
+                    <button id="btn-unirse-sala" class="btn btn-primary">🚪 Unirse</button>
+                </div>
+                <p class="hint">💡 Solicita el código de sala a tu docente</p>
+            </div>
+        </div>
+
+        <!-- Panel de Información de Sala -->
+        <div id="panel-sala-info" class="panel hidden">
+            <div class="sala-info">
+                <h3>🏠 Información de la Sala</h3>
+                <div class="sala-detalles">
+                    <div class="sala-codigo">
+                        <strong>📋 Código de Sala:</strong>
+                        <span id="codigo-sala-display" class="codigo-destacado"></span>
+                        <button id="btn-copiar-codigo" class="btn-icon" title="Copiar código">📋</button>
+                    </div>
+                    <div class="sala-participantes">
+                        <span id="participantes-count">👥 0 estudiantes conectados</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel del Docente -->
+        <div id="panel-docente" class="panel hidden">
+            <h2>👨‍🏫 Panel del Docente</h2>
+            <form id="form-pregunta" class="pregunta-form">
+                <div class="input-group">
+                    <label for="input-pregunta">❓ Pregunta:</label>
+                    <input 
+                        type="text" 
+                        id="input-pregunta" 
+                        placeholder="Escribe tu pregunta aquí..."
+                        required
+                        maxlength="200"
+                    >
+                </div>
+                <div class="input-group">
+                    <label for="input-respuesta">✅ Respuesta Correcta:</label>
+                    <input 
+                        type="text" 
+                        id="input-respuesta" 
+                        placeholder="Respuesta correcta..."
+                        required
+                        maxlength="50"
+                    >
+                </div>
+                <div class="botones-docente">
+                    <button type="submit" class="btn btn-success">📢 Publicar Pregunta</button>
+                    <button type="button" id="btn-reiniciar" class="btn btn-warning">🔄 Reiniciar Juego</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Panel del Juego -->
+        <div id="panel-juego" class="panel hidden">
+            <div class="usuario-info">
+                <span id="nombre-usuario" class="usuario-nombre"></span>
+            </div>
+
+            <!-- Área de la Pregunta -->
+            <div id="area-pregunta" class="pregunta-container">
+                <div id="sin-pregunta" class="sin-pregunta">
+                    <h3>⏳ Esperando pregunta...</h3>
+                    <p>El docente publicará una pregunta pronto</p>
+                </div>
+                
+                <div id="con-pregunta" class="con-pregunta hidden">
+                    <h3>❓ Pregunta:</h3>
+                    <div id="texto-pregunta" class="pregunta-texto"></div>
+                    
+                    <!-- Formulario de Respuesta -->
+                    <form id="form-respuesta" class="respuesta-form">
+                        <div class="input-group">
+                            <input 
+                                type="text" 
+                                id="input-respuesta-estudiante" 
+                                placeholder="Escribe tu respuesta aquí..."
+                                maxlength="50"
+                                disabled
+                            >
+                            <button type="submit" id="btn-enviar-respuesta" class="btn btn-primary" disabled>
+                                📤 Enviar Respuesta
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Área de Resultados -->
+            <div id="area-resultados" class="resultados-container hidden">
+                <div class="resultado-ganador">
+                    <h3>🏆 ¡Tenemos un Ganador!</h3>
+                    <div id="nombre-ganador" class="ganador-nombre"></div>
+                    <div id="respuesta-correcta" class="respuesta-correcta-mostrar"></div>
+                </div>
+            </div>
+
+            <!-- Área de Mensajes -->
+            <div id="area-mensajes" class="mensajes-container">
+                <div id="mensajes" class="mensajes"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>💻 Desarrollado con Socket.io | 🚀 Tiempo Real</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js"></script>
+</body>
+</html>
