@@ -32,22 +32,6 @@ heroku open
 4. Start: `npm start`
 5. ¡Listo! 🚀
 
-## 🌐 NETLIFY (Limitado para Socket.io)
-⚠️ **Advertencia**: Netlify tiene limitaciones con WebSockets
-```bash
-# Opción 1: CLI
-npm install -g netlify-cli
-netlify login
-netlify deploy --prod --dir=public
-
-# Opción 2: Web (más fácil)
-1. Ve a netlify.com
-2. Drag & drop carpeta 'public'
-3. ¡Listo! (pero Socket.io limitado)
-```
-
-**💡 Recomendación**: Usa Railway para funcionalidad completa
-
 ## ⚡ SCRIPT AUTOMÁTICO
 ```bash
 # Ejecutar script incluido
