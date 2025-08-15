@@ -29,10 +29,14 @@ class RespuestaController {
                 return;
             }
 
-            // Validar respuesta
-            const validacionRespuesta = Validator.validarRespuesta(respuestaUsuario);
-            if (!validacionRespuesta.valido) {
-                socket.emit('error:validacion', validacionRespuesta.mensaje);
+            // Validar respuesta (debe ser a, b, c o d)
+            const clave = respuestaUsuario.toLowerCase().trim();
+            const clavesValidas = ['a', 'b', 'c', 'd'];
+            if (!clavesValidas.includes(clave)) {
+                socket.emit('respuesta:incorrecta', {
+                    mensaje: 'Código de opción incorrecto. Debe ser a, b, c o d.',
+                    respuestaEnviada: respuestaUsuario
+                });
                 return;
             }
 
@@ -48,19 +52,17 @@ class RespuestaController {
                 return;
             }
 
-            const respuestaLimpia = validacionRespuesta.respuestaLimpia;
-
             logger.info('Respuesta recibida', { 
                 usuario: usuario.nombre, 
                 sala: usuario.codigoSala, 
-                respuesta: respuestaLimpia 
+                respuesta: clave 
             });
 
             // Verificar si la respuesta es correcta
-            if (this.salaService.verificarRespuesta(usuario.codigoSala, respuestaLimpia)) {
-                this._manejarRespuestaCorrecta(socket, usuario, sala, respuestaLimpia);
+            if (this.salaService.verificarRespuesta(usuario.codigoSala, clave)) {
+                this._manejarRespuestaCorrecta(socket, usuario, sala, clave);
             } else {
-                this._manejarRespuestaIncorrecta(socket, usuario, respuestaLimpia);
+                this._manejarRespuestaIncorrecta(socket, usuario, clave);
             }
 
         } catch (error) {

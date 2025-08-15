@@ -131,9 +131,9 @@ class SalaController {
     }
 
     /**
-     * Publicar nueva pregunta
+     * Publicar nueva pregunta con opciones
      * @param {object} socket - Socket del usuario
-     * @param {object} datos - Datos de la pregunta {pregunta, respuesta}
+     * @param {object} datos - Datos de la pregunta {pregunta, opciones, respuestaCorrecta}
      */
     publicarPregunta(socket, datos) {
         try {
@@ -144,22 +144,36 @@ class SalaController {
             }
 
             // Validar datos de la pregunta
-            const validacion = Validator.validarDatosPregunta(datos);
-            if (!validacion.valido) {
-                socket.emit('error:validacion', validacion.errores.join(', '));
+            if (!datos.pregunta || !datos.opciones || !datos.respuestaCorrecta) {
+                socket.emit('error:validacion', 'Debes ingresar pregunta, opciones y respuesta correcta');
+                return;
+            }
+            const opciones = datos.opciones;
+            const clavesValidas = ['a', 'b', 'c', 'd'];
+            if (typeof opciones !== 'object' || clavesValidas.some(k => !opciones[k])) {
+                socket.emit('error:validacion', 'Las opciones deben incluir a, b, c y d');
+                return;
+            }
+            if (!clavesValidas.includes(datos.respuestaCorrecta.toLowerCase())) {
+                socket.emit('error:validacion', 'La respuesta correcta debe ser a, b, c o d');
                 return;
             }
 
             const codigoSala = usuario.codigoSala;
-            const { pregunta, respuesta } = validacion.datosLimpios;
+            this.salaService.establecerPregunta(
+                codigoSala,
+                datos.pregunta,
+                opciones,
+                datos.respuestaCorrecta
+            );
 
-            // Establecer la pregunta en la sala
-            this.salaService.establecerPregunta(codigoSala, pregunta, respuesta);
+            logger.salaActivity('pregunta-publicada', codigoSala, { pregunta: datos.pregunta });
 
-            logger.salaActivity('pregunta-publicada', codigoSala, { pregunta });
-
-            // Enviar la pregunta a todos en la sala (sin la respuesta)
-            this.io.to(codigoSala).emit('pregunta:publicada', pregunta);
+            // Enviar la pregunta y opciones a todos en la sala (sin la respuesta)
+            this.io.to(codigoSala).emit('pregunta:publicada', {
+                pregunta: datos.pregunta,
+                opciones: opciones
+            });
 
             // Notificar que la ronda ha comenzado
             this.io.to(codigoSala).emit('ronda:iniciada');

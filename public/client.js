@@ -170,6 +170,53 @@ function ocultarResultado() {
     areaResultados.classList.add('hidden');
 }
 
+// Mostrar pregunta con opciones (estudiante)
+function mostrarPreguntaConOpciones(data) {
+    textoPregunta.textContent = data.pregunta;
+    sinPregunta.classList.add('hidden');
+    conPregunta.classList.remove('hidden');
+    
+    // Limpiar opciones previas
+    const opcionesContainer = document.getElementById('opciones-container');
+    if (opcionesContainer) opcionesContainer.remove();
+    
+    // Crear opciones
+    const form = document.getElementById('form-respuesta');
+    const container = document.createElement('div');
+    container.id = 'opciones-container';
+    container.className = 'opciones-multichoice';
+    container.style.margin = '15px 0';
+    
+    ['a','b','c','d'].forEach(clave => {
+        const div = document.createElement('div');
+        div.style.margin = '8px 0';
+        
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'respuesta-multichoice';
+        radio.id = `opcion-${clave}-radio`;
+        radio.value = clave;
+        radio.style.marginRight = '8px';
+        
+        const label = document.createElement('label');
+        label.textContent = `${clave.toUpperCase()}: ${data.opciones[clave]}`;
+        label.htmlFor = `opcion-${clave}-radio`;
+        label.style.cursor = 'pointer';
+        
+        div.appendChild(radio);
+        div.appendChild(label);
+        container.appendChild(div);
+    });
+    
+    form.insertBefore(container, form.firstChild);
+    
+    if (!esDocente) {
+        habilitarCampoRespuesta();
+        rondaActiva = true;
+        mostrarMensaje('📢 Nueva pregunta publicada. ¡Elige la opción correcta!', 'info');
+    }
+}
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
     // Foco inicial
@@ -263,18 +310,26 @@ inputCodigoSala.addEventListener('input', (e) => {
 // Publicar pregunta (solo docente)
 formPregunta.addEventListener('submit', (e) => {
     e.preventDefault();
-    
     const pregunta = inputPregunta.value.trim();
-    const respuesta = inputRespuesta.value.trim();
-    
-    if (!pregunta || !respuesta) {
-        mostrarMensaje('❌ Completa todos los campos', 'error');
+    const opcionA = document.getElementById('opcion-a').value.trim();
+    const opcionB = document.getElementById('opcion-b').value.trim();
+    const opcionC = document.getElementById('opcion-c').value.trim();
+    const opcionD = document.getElementById('opcion-d').value.trim();
+    const respuestaCorrecta = document.getElementById('select-respuesta-correcta').value;
+    if (!pregunta || !opcionA || !opcionB || !opcionC || !opcionD || !respuestaCorrecta) {
+        mostrarMensaje('❌ Completa todos los campos y selecciona la respuesta correcta', 'error');
         return;
     }
-    
-    // Emitir nueva pregunta
-    socket.emit('pregunta:nueva', { pregunta, respuesta });
-    
+    socket.emit('pregunta:nueva', {
+        pregunta,
+        opciones: {
+            a: opcionA,
+            b: opcionB,
+            c: opcionC,
+            d: opcionD
+        },
+        respuestaCorrecta
+    });
     limpiarFormulario(formPregunta);
     mostrarMensaje('📢 Pregunta publicada a todos los estudiantes', 'success');
 });
@@ -295,18 +350,19 @@ formRespuesta.addEventListener('submit', (e) => {
         return;
     }
     
-    const respuesta = inputRespuestaEstudiante.value.trim();
-    if (!respuesta) {
-        mostrarMensaje('❌ Escribe una respuesta', 'error');
+    // Obtener opción seleccionada
+    const seleccion = document.querySelector('input[name="respuesta-multichoice"]:checked');
+    if (!seleccion) {
+        mostrarMensaje('❌ Selecciona una opción', 'error');
         return;
     }
     
     // Emitir respuesta
-    socket.emit('respuesta:enviada', respuesta);
+    socket.emit('respuesta:enviada', seleccion.value);
     
     // Deshabilitar temporalmente el campo
     deshabilitarCampoRespuesta();
-    mostrarMensaje(`📤 Respuesta enviada: "${respuesta}"`, 'info');
+    mostrarMensaje(`📤 Respuesta enviada: "${seleccion.value.toUpperCase()}"`, 'info');
     
     limpiarFormulario(formRespuesta);
 });
@@ -389,10 +445,10 @@ socket.on('sala:info-actualizada', (datos) => {
 });
 
 // Nueva pregunta publicada
-socket.on('pregunta:publicada', (pregunta) => {
-    console.log('Nueva pregunta recibida:', pregunta);
+socket.on('pregunta:publicada', (data) => {
+    console.log('Nueva pregunta recibida:', data);
     ocultarResultado();
-    mostrarPregunta(pregunta);
+    mostrarPreguntaConOpciones(data);
 });
 
 // Ronda iniciada

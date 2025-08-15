@@ -110,16 +110,17 @@ class SalaService {
     }
 
     /**
-     * Establecer pregunta en una sala
+     * Establecer pregunta en una sala con opciones
      * @param {string} codigo - Código de la sala
      * @param {string} pregunta - La pregunta
-     * @param {string} respuesta - La respuesta correcta
+     * @param {object} opciones - Opciones {a, b, c, d}
+     * @param {string} respuestaCorrecta - Clave de la respuesta correcta
      * @returns {boolean} - True si se estableció correctamente
      */
-    establecerPregunta(codigo, pregunta, respuesta) {
+    establecerPregunta(codigo, pregunta, opciones, respuestaCorrecta) {
         const sala = this.obtenerSala(codigo);
         if (sala) {
-            sala.establecerPregunta(pregunta, respuesta);
+            sala.establecerPregunta(pregunta, opciones, respuestaCorrecta);
             console.log(`❓ Nueva pregunta en sala ${codigo}: ${pregunta}`);
             return true;
         }
@@ -127,9 +128,9 @@ class SalaService {
     }
 
     /**
-     * Verificar respuesta en una sala
+     * Verificar respuesta en una sala (clave: a, b, c, d)
      * @param {string} codigo - Código de la sala
-     * @param {string} respuesta - Respuesta del usuario
+     * @param {string} respuesta - Respuesta del usuario (clave)
      * @returns {boolean} - True si es correcta
      */
     verificarRespuesta(codigo, respuesta) {

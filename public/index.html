@@ -106,14 +106,21 @@
                     >
                 </div>
                 <div class="input-group">
-                    <label for="input-respuesta">✅ Respuesta Correcta:</label>
-                    <input 
-                        type="text" 
-                        id="input-respuesta" 
-                        placeholder="Respuesta correcta..."
-                        required
-                        maxlength="50"
-                    >
+                    <label>Opciones:</label>
+                    <input type="text" id="opcion-a" placeholder="Opción A" required maxlength="100">
+                    <input type="text" id="opcion-b" placeholder="Opción B" required maxlength="100">
+                    <input type="text" id="opcion-c" placeholder="Opción C" required maxlength="100">
+                    <input type="text" id="opcion-d" placeholder="Opción D" required maxlength="100">
+                </div>
+                <div class="input-group">
+                    <label for="select-respuesta-correcta">✅ Respuesta Correcta:</label>
+                    <select id="select-respuesta-correcta" required>
+                        <option value="">Selecciona la opción correcta</option>
+                        <option value="a">A</option>
+                        <option value="b">B</option>
+                        <option value="c">C</option>
+                        <option value="d">D</option>
+                    </select>
                 </div>
                 <div class="botones-docente">
                     <button type="submit" class="btn btn-success">📢 Publicar Pregunta</button>

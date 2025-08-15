@@ -6,7 +6,8 @@ class Sala {
         this.codigo = codigo;
         this.docente = docente;
         this.pregunta = '';
-        this.respuesta = '';
+        this.opciones = {};
+        this.respuestaCorrecta = '';
         this.activa = false;
         this.estudiantes = new Set();
         this.fechaCreacion = new Date();
@@ -33,9 +34,16 @@ class Sala {
      * @param {string} pregunta - La pregunta
      * @param {string} respuesta - La respuesta correcta
      */
-    establecerPregunta(pregunta, respuesta) {
+    /**
+     * Establecer una nueva pregunta con opciones
+     * @param {string} pregunta - La pregunta
+     * @param {object} opciones - Opciones {a, b, c, d}
+     * @param {string} respuestaCorrecta - Clave de la respuesta correcta (a, b, c, d)
+     */
+    establecerPregunta(pregunta, opciones, respuestaCorrecta) {
         this.pregunta = pregunta;
-        this.respuesta = respuesta.toLowerCase().trim();
+        this.opciones = opciones;
+        this.respuestaCorrecta = respuestaCorrecta.toLowerCase().trim();
         this.activa = true;
     }
 
@@ -44,8 +52,13 @@ class Sala {
      * @param {string} respuesta - Respuesta del usuario
      * @returns {boolean} - True si es correcta
      */
+    /**
+     * Verificar si una respuesta es correcta (clave: a, b, c, d)
+     * @param {string} respuesta - Respuesta del usuario (clave)
+     * @returns {boolean} - True si es correcta
+     */
     verificarRespuesta(respuesta) {
-        return respuesta.toLowerCase().trim() === this.respuesta;
+        return respuesta.toLowerCase().trim() === this.respuestaCorrecta;
     }
 
     /**
@@ -60,7 +73,8 @@ class Sala {
      */
     reiniciar() {
         this.pregunta = '';
-        this.respuesta = '';
+        this.opciones = {};
+        this.respuestaCorrecta = '';
         this.activa = false;
     }
 
