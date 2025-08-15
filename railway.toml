@@ -1,3 +1,9 @@
-# Configuración para Railway
-PORT=3000
-NODE_ENV=production
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "npm start"
+restartPolicyType = "always"
+
+[variables]
+NODE_ENV = "production"
